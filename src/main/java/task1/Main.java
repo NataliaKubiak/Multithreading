@@ -1,22 +1,26 @@
 package task1;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 
 public class Main {
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, ExecutionException {
         String[] texts = new String[25];
         for (int i = 0; i < texts.length; i++) {
             texts[i] = generateText("aab", 30_000);
         }
 
-        //Original Time: 37737ms
-        //Time with threads: 4892ms
-        List<Thread> threads = new ArrayList<>();
+        List<FutureTask> futureList = new ArrayList<>();
 
         long startTs = System.currentTimeMillis(); // start time
         for (String text : texts) {
-            Runnable logic = () -> {
+            Callable<Integer> callableLogic = () -> {
                 int maxSize = 0;
                 for (int i = 0; i < text.length(); i++) {
                     for (int j = 0; j < text.length(); j++) {
@@ -36,16 +40,25 @@ public class Main {
                     }
                 }
                 System.out.println(text.substring(0, 100) + " -> " + maxSize);
+                return maxSize;
             };
-            Thread thread = new Thread(logic);
-            thread.start();
-            threads.add(thread);
+            FutureTask<Integer> integerFutureTask = new FutureTask<>(callableLogic);
+            new Thread(integerFutureTask).start();
+            futureList.add(integerFutureTask);
         }
-        for (Thread thread : threads) {
-            thread.join();
-        }
-        long endTs = System.currentTimeMillis(); // end time
 
+        List<Integer> taskResults = new ArrayList<>();
+        for (Future future : futureList) {
+            taskResults.add((Integer) future.get());
+        }
+        int maxInterval = taskResults.stream().max(Integer::compareTo).orElse(-1);
+        if (maxInterval == -1) {
+            System.out.println("Oh no! Something went wrong :(");
+        } else {
+            System.out.println("The biggest amount of a's is " + maxInterval);
+        }
+
+        long endTs = System.currentTimeMillis(); // end time
         System.out.println("Time: " + (endTs - startTs) + "ms");
     }
 
