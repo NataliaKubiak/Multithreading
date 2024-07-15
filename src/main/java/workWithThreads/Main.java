@@ -1,4 +1,4 @@
-package task1;
+package workWithThreads;
 
 import java.util.ArrayList;
 import java.util.List;
