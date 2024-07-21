@@ -5,11 +5,12 @@ import java.util.*;
 public class Main {
 
     public static final Map<Integer, Integer> sizeToFreq = new HashMap<>();
+    public static int THREADS_COUNT = 1000;
 
     public static void main(String[] args) throws InterruptedException {
 
         //в каждом потоке считаем общее количество R в строке
-        Runnable logic = () -> {
+        Runnable countR = () -> {
             String route = generateRoute("RLRFR", 100);
             int counter = 0;
 
@@ -20,21 +21,49 @@ public class Main {
             }
             synchronized (sizeToFreq) {
                 sizeToFreq.put(counter, sizeToFreq.getOrDefault(counter, 0) + 1);
+                sizeToFreq.notify();
             }
         };
 
-        int threadsCount = 1000;
+        Runnable showMax = () -> {
+            while (!Thread.interrupted()) {
+                int maxKey = -1;
+                int maxValue = Integer.MIN_VALUE;
+
+                synchronized (sizeToFreq) {
+                        try {
+                            sizeToFreq.wait();
+                        } catch (InterruptedException e) {
+                            return;
+                        }
+
+                    for (Map.Entry<Integer, Integer> entry : sizeToFreq.entrySet()) {
+                        int currentValue = entry.getValue();
+                        if (currentValue > maxValue) {
+                            maxValue = currentValue;
+                            maxKey = entry.getKey();
+                        }
+                    }
+                    System.out.println("Текущий лидер среди частот: " + maxKey);
+                }
+            }
+        };
+
+        Thread threadMax = new Thread(showMax);
+        threadMax.start();
+
         List<Thread> threads = new ArrayList<>();
-        for (int i = 0; i < threadsCount; i++) {
-            Thread thread = new Thread(logic);
-            thread.start();
-            threads.add(thread);
+        for (int i = 0; i < THREADS_COUNT; i++) {
+            Thread threadCountR = new Thread(countR);
+            threadCountR.start();
+            threads.add(threadCountR);
         }
 
         //ждем пока все threads завершат работу
         for (Thread thread : threads) {
             thread.join();
         }
+        threadMax.interrupt();
 
         //вычисляем наибольшее количество повторений
         int maxKey = -1;
