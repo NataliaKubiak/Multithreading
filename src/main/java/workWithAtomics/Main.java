@@ -19,49 +19,25 @@ public class Main {
         //Thread 1 - Count palindrome
         Thread thread1 = new Thread(() -> {
             for (String text : texts) {
-                if (text.length() == 3) {
-                    int left = 0;
-                    int right = text.length() - 1;
-                    while (left < right) {
-                        if (text.charAt(left) == text.charAt(right)) {
-                            left++;
-                            right--;
-                            if (left >= right) {
+                int left = 0;
+                int right = text.length() - 1;
+                while (left < right) {
+                    if (text.charAt(left) == text.charAt(right)) {
+                        left++;
+                        right--;
+                        if (left >= right) {
+
+                            //вместо нескольких while-loops переписала что 1 loop и потом проверяется длинна "красивого" слова
+                            if (text.length() == 3) {
                                 counter3.addAndGet(1);
-                            }
-                        } else {
-                            break;
-                        }
-                    }
-                }
-                if (text.length() == 4) {
-                    int left = 0;
-                    int right = text.length() - 1;
-                    while (left < right) {
-                        if (text.charAt(left) == text.charAt(right)) {
-                            left++;
-                            right--;
-                            if (left >= right) {
+                            } else if (text.length() == 4) {
                                 counter4.addAndGet(1);
-                            }
-                        } else {
-                            break;
-                        }
-                    }
-                }
-                if (text.length() == 5) {
-                    int left = 0;
-                    int right = text.length() - 1;
-                    while (left < right) {
-                        if (text.charAt(left) == text.charAt(right)) {
-                            left++;
-                            right--;
-                            if (left >= right) {
+                            } else {
                                 counter5.addAndGet(1);
                             }
-                        } else {
-                            break;
                         }
+                    } else {
+                        break;
                     }
                 }
             }
@@ -72,30 +48,19 @@ public class Main {
         //Thread 2 - Count words with the same letters
         Thread thread2 = new Thread(() -> {
             for (String text : texts) {
-                if (text.length() == 3) {
-                    Set<Character> letters = new HashSet<>();
-                    for (char c : text.toCharArray()) {
-                        letters.add(c);
-                    }
-                    if (letters.size() == 1) {
+
+                Set<Character> letters = new HashSet<>();
+                for (char c : text.toCharArray()) {
+                    letters.add(c);
+                }
+                if (letters.size() == 1) {
+
+                    //вместо нескольких while-loops переписала что 1 loop и потом проверяется длинна "красивого" слова
+                    if (text.length() == 3) {
                         counter3.addAndGet(1);
-                    }
-
-                } else if (text.length() == 4) {
-                    Set<Character> letters = new HashSet<>();
-                    for (char c : text.toCharArray()) {
-                        letters.add(c);
-                    }
-                    if (letters.size() == 1) {
+                    } else if (text.length() == 4) {
                         counter4.addAndGet(1);
-                    }
-
-                } else {
-                    Set<Character> letters = new HashSet<>();
-                    for (char c : text.toCharArray()) {
-                        letters.add(c);
-                    }
-                    if (letters.size() == 1) {
+                    } else {
                         counter5.addAndGet(1);
                     }
                 }
@@ -107,43 +72,23 @@ public class Main {
         //Thread 3 - Count words with ascending letters
         Thread thread3 = new Thread(() -> {
             for (String text : texts) {
-                if (text.length() == 3) {
-                    int i = 1;
-                    while (i < text.length()) {
-                        if (text.charAt(i - 1) <= text.charAt(i)) {
-                            i++;
-                            if (i == text.length()) {
+                int i = 1;
+                while (i < text.length()) {
+                    if (text.charAt(i - 1) <= text.charAt(i)) {
+                        i++;
+                        if (i == text.length()) {
+
+                            //вместо нескольких while-loops переписала что 1 loop и потом проверяется длинна "красивого" слова
+                            if (text.length() == 3) {
                                 counter3.addAndGet(1);
-                            }
-                        } else {
-                            break;
-                        }
-                    }
-                }
-                if (text.length() == 4) {
-                    int i = 1;
-                    while (i < text.length()) {
-                        if (text.charAt(i - 1) <= text.charAt(i)) {
-                            i++;
-                            if (i == text.length()) {
+                            } else if (text.length() == 4) {
                                 counter4.addAndGet(1);
-                            }
-                        } else {
-                            break;
-                        }
-                    }
-                }
-                if (text.length() == 5) {
-                    int i = 1;
-                    while (i < text.length()) {
-                        if (text.charAt(i - 1) <= text.charAt(i)) {
-                            i++;
-                            if (i == text.length()) {
+                            } else {
                                 counter5.addAndGet(1);
                             }
-                        } else {
-                            break;
                         }
+                    } else {
+                        break;
                     }
                 }
             }
